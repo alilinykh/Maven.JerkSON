@@ -54,7 +54,7 @@ public class ItemParser {
         }
         for (String s: keyValuePairs
              ) {
-            final String reg = "[^\\W]* + ([\\w]*)$";
+            final String reg = "([^\\W]*) + (([\\w]*)$)";
             final Pattern pa = Pattern.compile(reg);
             Matcher matcher1 = pa.matcher(s);
             while (matcher1.find()) {
