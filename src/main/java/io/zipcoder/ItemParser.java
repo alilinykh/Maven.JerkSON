@@ -49,9 +49,8 @@ public class ItemParser {
         final Pattern pattern1 = Pattern.compile(regex1);
 
         Matcher matcher = pattern1.matcher(singleItem);
-        keyValuePairs.add(matcher.group(0));
-        for (int i = 1; i <matcher.groupCount(); i++) {
-            keyValuePairs.add(matcher.group(i));
+        while (matcher.find()) {
+            keyValuePairs.add(matcher.group(0));
         }
         for (String s: keyValuePairs
              ) {
