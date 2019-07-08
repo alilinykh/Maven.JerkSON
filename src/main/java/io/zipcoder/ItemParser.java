@@ -54,13 +54,15 @@ public class ItemParser {
         }
         for (String s: keyValuePairs
              ) {
-            final String reg = "[^\\W]*";
+            final String reg = "[^\\W]* + ([\\w]*)$";
             final Pattern pa = Pattern.compile(reg);
             Matcher matcher1 = pa.matcher(s);
-
-            if (matcher1.group(0).toLowerCase().equals("name")) {
-                System.out.println("!!");
+            while (matcher1.find()) {
+                if (matcher1.group(0).toLowerCase().equals("name")) {
+                    String name = matcher1.group(1);
+                }
             }
+
 
 
 
