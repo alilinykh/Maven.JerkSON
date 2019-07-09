@@ -14,12 +14,12 @@ public class ItemParser {
         List<Item> rslt = new ArrayList<>();
         List<String> sepItems = new ArrayList<>();
 
-        String regex = "[^##]+";
+        String regex = "(.*?##)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(valueToParse);
 
         while (matcher.find()) {
-            sepItems.add(matcher.group(0));
+            sepItems.add(matcher.group(1));
         }
         for ( String s : sepItems
              ) {
@@ -35,11 +35,12 @@ public class ItemParser {
     }
 
     public Item parseSingleItem(String singleItem) throws ItemParseException {
-        String string = replaceValuesToAt(singleItem);
+        Item rslt =null;
+        String string = replaceWith(singleItem,"[:|*|^|%]","@");
         String nameValue = null;
-        Double priceValue = null;
-        String typeValue = null;
-        String expirationValue = null;
+        Double priceValue = 0.0;
+        String typeValue = "";
+        String expirationValue = "";
         List<String> keyValuePairs = new ArrayList<>();
 
         String regex1 = "[^;]+";
@@ -63,8 +64,11 @@ public class ItemParser {
                         break;
                     }
                     case "price": {
-                        priceValue = Double.parseDouble(getInfo(s));
-                        if (priceValue == null) {throw new ItemParseException();}
+                        String value = getInfo(s);
+                        if (value == null) {throw new ItemParseException();}
+                        else {
+                            priceValue = Double.parseDouble(value);
+                        }
                         break;
                     }
                     case "type": {
@@ -73,25 +77,28 @@ public class ItemParser {
                         break;
                     }
                     case "expiration": {
-                        expirationValue = getInfo(s);
-//                        if (expirationValue.contains("##")
-                        if (expirationValue == null) {throw new ItemParseException();}
+                        String value = getInfo(s);
+                        if (value == null) {throw new ItemParseException();}
+                        else {
+                            expirationValue = replaceWith(getInfo(s),"(##)","");
+                        }
                         break;
                     }
                 }
             }
+            rslt = new Item(nameValue, priceValue, typeValue, expirationValue);
+            if (rslt.getName() == null) { break;}
         }
 
-
-        return new Item(nameValue, priceValue, typeValue, expirationValue);
+        return rslt;
     }
 
-    public static String replaceValuesToAt(String string) {
-        String regex = "[:|*|^|%]";
+    public static String replaceWith(String string, String regex, String replaceWith) {
+        String r = regex; //"[:|*|^|%]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(string);
         while (matcher.find()) {
-            string = matcher.replaceAll("@");
+            string = matcher.replaceAll(replaceWith);
         }
         return string;
     }
@@ -99,26 +106,10 @@ public class ItemParser {
 
     public static String getInfo(String string) {
 
-        final String reg = "@(.*)"; //  -----  ([\w]*)$
-        final Pattern pa = Pattern.compile(reg);
+        String reg = "@(.*)";
+        Pattern pa = Pattern.compile(reg);
         Matcher matcher1 = pa.matcher(string);
         while (matcher1.find()) return matcher1.group(1).toLowerCase();
         return null;
     }
-//
-//    public static Double getPrice(String string) {
-//        final String reg = ""; //  -----  ([\w]*)$
-//        final Pattern pa = Pattern.compile(reg);
-//        Matcher matcher1 = pa.matcher(string);
-//        while (matcher1.find()) return matcher1.group(0);
-//        return null;
-//    }
-//
-//    public static String getExpiration(String string) {
-//        final String reg = "[\\w]*$"; //  -----  ([\w]*)$
-//        final Pattern pa = Pattern.compile(reg);
-//        Matcher matcher1 = pa.matcher(string);
-//        while (matcher1.find()) return matcher1.group(0).toLowerCase();
-//        return null;
-//    }
 }
